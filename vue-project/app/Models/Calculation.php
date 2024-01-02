@@ -9,5 +9,6 @@ class Calculation extends Model
 {
     use HasFactory;
     protected $table = 'calculations';
-    protected $fillable = ['expression', 'result'];
+    protected $fillable = ['expression', 'result', 'user_id'];
+
 }
