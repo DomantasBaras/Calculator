@@ -60,29 +60,23 @@ export default {
     async saveCalculation(result, expression) {
       try {
         const { data } = await this.$inertia.post('/save-calculation', { result, expression }) || {};
-
-        if (data.success) {
-          console.log('Calculation result saved successfully!');
-        } else {
-          console.error('Failed to save calculation result.', data.error);
-        }
       } catch (error) {
         console.error('Error saving calculation result:', error);
       }
     },
 
     async handleEquals() {
-  try {
-    const expression = this.prevCalcVal + this.operators + this.calcVal;
-    const result = new Function('return ' + expression)();
-    this.prevCalcVal = '';
-    this.operators = null;
-    this.calcVal = result.toString();
+      try {
+        const expression = this.prevCalcVal + this.operators + this.calcVal;
+        const result = new Function('return ' + expression)();
+        this.prevCalcVal = '';
+        this.operators = null;
+        this.calcVal = result.toString();
 
-    await this.saveCalculation(result, expression);
-  } catch (error) {
-    console.error('Error calculating result:', error);
-  }
+        await this.saveCalculation(result, expression);
+      } catch (error) {
+        console.error('Error calculating result:', error);
+      }
 },
 
 

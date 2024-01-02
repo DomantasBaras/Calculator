@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use App\Models\Calculation;
 use App\Events\NewCalculationEvent;
 use Illuminate\Support\Facades\Auth;
-use App\Models\User;
 
 class CalculatorController extends Controller
 {
@@ -15,7 +14,7 @@ class CalculatorController extends Controller
         try {
             $result = $request->input('result');
             $expression = $request->input('expression');
-
+            
             // Additional check: Ensure both 'result' and 'expression' are present
             if (!$result || !$expression) {
                 return inertia('HomePage', [
@@ -30,17 +29,20 @@ class CalculatorController extends Controller
                 'expression' => $expression,
                 'result' => $result
             ]);
-
-            // Trigger the event to broadcast the new calculation
-            event(new NewCalculationEvent($calculation));
+            
 
             // Log the saved calculation result
             \Log::info('Calculation result saved successfully:', ['calculation' => $calculation]);
 
-            // Return the Inertia view
             return inertia('HomePage', [
                 'success' => true,
-                'calculation' => $calculation, 
+                'calculation' => $calculation, // Pass the calculation to the view
+            ]);
+            event(new NewCalculationEvent($calculation));
+
+            // Return the Inertia view
+            return inertia('HomePage', [
+                'lastCalculations' => $lastCalculations,
             ]);
         } catch (\Exception $e) {
             // Log the error
@@ -53,11 +55,11 @@ class CalculatorController extends Controller
         }
     }
 
-
     public function showLastCalculations()
     {
         $user = Auth::user();
-        // Retrieve the last 10 calculations from the database
+
+        // Retrieve the last 10 calculations for the authenticated user
         $lastCalculations = $user->calculations()->latest()->take(10)->get();
 
         // Log the data to the console for debugging
